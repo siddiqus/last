@@ -1,3 +1,17 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.stamp {
+  font-size: 11.5px;
+  line-height: 1;
+  color: var(--last-fg-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
 .root {
   border: 1px solid transparent;
   border-radius: var(--last-radius-md);

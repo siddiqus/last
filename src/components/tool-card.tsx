@@ -34,6 +34,7 @@ import {
   IconToolbox,
 } from "./icons";
 import { QuestionList } from "./question-list";
+import { TimeStamp } from "./time-stamp";
 import { TodoList } from "./todo-list";
 import styles from "./tool-card.module.css";
 
@@ -78,88 +79,95 @@ export const ToolCard = memo(function ToolCard({ block }: { block: ToolBlock }) 
   const quiet = !failed && hidesResultOnSuccess(block.name, block.result);
 
   return (
-    <div
-      className={[
-        styles.root,
-        running ? styles.running : "",
-        failed ? styles.failed : "",
-        open ? styles.open : "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-    >
-      <button
-        aria-expanded={open}
-        className={styles.head}
-        onClick={() => setOpen((value) => !value)}
-        type="button"
+    <div className={styles.wrap}>
+      <TimeStamp className={styles.stamp} iso={block.timestamp ?? null} />
+      <div
+        className={[
+          styles.root,
+          running ? styles.running : "",
+          failed ? styles.failed : "",
+          open ? styles.open : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
       >
-        <span className={styles.glyph}>{glyphFor(block.name)}</span>
-        <span className={styles.name}>{toolDisplayName(block.name)}</span>
-        <span className={headline ? styles.errorLine : styles.summary}>{headline ?? summary}</span>
-        <span className={styles.status}>
-          {block.streaming || running ? (
-            <CircularProgress />
-          ) : (
-            <span className={`${styles.dot} ${failed ? styles.dotError : ""}`} />
-          )}
-        </span>
-        <span className={styles.chevron}>
-          <IconChevronRight />
-        </span>
-      </button>
+        <button
+          aria-expanded={open}
+          className={styles.head}
+          onClick={() => setOpen((value) => !value)}
+          type="button"
+        >
+          <span className={styles.glyph}>{glyphFor(block.name)}</span>
+          <span className={styles.name}>{toolDisplayName(block.name)}</span>
+          <span className={headline ? styles.errorLine : styles.summary}>
+            {headline ?? summary}
+          </span>
+          <span className={styles.status}>
+            {block.streaming || running ? (
+              <CircularProgress />
+            ) : (
+              <span className={`${styles.dot} ${failed ? styles.dotError : ""}`} />
+            )}
+          </span>
+          <span className={styles.chevron}>
+            <IconChevronRight />
+          </span>
+        </button>
 
-      {open && (
-        <div className={styles.body} data-find={block.id}>
-          {todos && <TodoList todos={todos} />}
+        {open && (
+          <div className={styles.body} data-find={block.id}>
+            {todos && <TodoList todos={todos} />}
 
-          {asking && <QuestionList answers={block.result?.answers ?? null} questions={questions} />}
+            {asking && (
+              <QuestionList answers={block.result?.answers ?? null} questions={questions} />
+            )}
 
-          {sections.map((section) => (
-            <CodeBlock
-              code={section.code}
-              key={section.label}
-              label={section.label}
-              language={section.language}
-              numbered={section.numbered}
-            />
-          ))}
-
-          {block.subText && (
-            <div className={styles.section}>
-              <span className={styles.sectionLabel} data-find-skip>
-                subagent
-              </span>
-              <div className={styles.sub}>{block.subText}</div>
-            </div>
-          )}
-
-          {block.result ? (
-            quiet ? null : block.result.text ? (
+            {sections.map((section) => (
               <CodeBlock
-                code={block.result.text}
-                label={block.result.isError ? "error" : "result"}
-                language="text"
-                tone={block.result.isError ? "error" : "default"}
+                code={section.code}
+                key={section.label}
+                label={section.label}
+                language={section.language}
+                numbered={section.numbered}
               />
+            ))}
+
+            {block.subText && (
+              <div className={styles.section}>
+                <span className={styles.sectionLabel} data-find-skip>
+                  subagent
+                </span>
+                <div className={styles.sub}>{block.subText}</div>
+              </div>
+            )}
+
+            {block.result ? (
+              quiet ? null : block.result.text ? (
+                <CodeBlock
+                  code={block.result.text}
+                  label={block.result.isError ? "error" : "result"}
+                  language="text"
+                  tone={block.result.isError ? "error" : "default"}
+                />
+              ) : (
+                <p className={styles.empty} data-find-skip>
+                  {block.result.images > 0
+                    ? `Returned ${block.result.images} image${block.result.images > 1 ? "s" : ""}.`
+                    : "No output."}
+                </p>
+              )
             ) : (
               <p className={styles.empty} data-find-skip>
-                {block.result.images > 0
-                  ? `Returned ${block.result.images} image${block.result.images > 1 ? "s" : ""}.`
-                  : "No output."}
+                {!asking
+                  ? "Still running…"
+                  : runsHere
+                    ? "Waiting for an answer…"
+                    : "Answer this in the terminal where Claude is running."}
               </p>
-            )
-          ) : (
-            <p className={styles.empty} data-find-skip>
-              {!asking
-                ? "Still running…"
-                : runsHere
-                  ? "Waiting for an answer…"
-                  : "Answer this in the terminal where Claude is running."}
-            </p>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 });

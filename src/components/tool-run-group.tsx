@@ -7,6 +7,7 @@ import { toolDisplayName } from "@/lib/tools";
 import type { Block } from "@/lib/types";
 
 import { IconChevronRight, IconLayerGroup } from "./icons";
+import { TimeStamp } from "./time-stamp";
 import styles from "./tool-run-group.module.css";
 import { ToolCard } from "./tool-card";
 
@@ -23,33 +24,37 @@ export const ToolRunGroup = memo(function ToolRunGroup({ blocks }: { blocks: Too
   const [open, setOpen] = useRevealOpen(failed, ...blocks.map((block) => block.id));
 
   return (
-    <div className={`${styles.root} ${failed ? styles.failed : ""} ${open ? styles.open : ""}`}>
-      <button
-        aria-expanded={open}
-        className={styles.head}
-        onClick={() => setOpen((value) => !value)}
-        type="button"
-      >
-        <span className={styles.glyph}>
-          <IconLayerGroup />
-        </span>
-        <span className={styles.name}>
-          {blocks.length} tool call{blocks.length === 1 ? "" : "s"}
-          {failed ? " · failed" : ""}
-        </span>
-        <span className={styles.summary}>{preview(blocks)}</span>
-        <span className={styles.chevron}>
-          <IconChevronRight />
-        </span>
-      </button>
+    <div className={styles.wrap}>
+      <TimeStamp className={styles.stamp} iso={blocks[0].timestamp ?? null} />
 
-      {open && (
-        <div className={styles.body}>
-          {blocks.map((block) => (
-            <ToolCard block={block} key={block.id} />
-          ))}
-        </div>
-      )}
+      <div className={`${styles.root} ${failed ? styles.failed : ""} ${open ? styles.open : ""}`}>
+        <button
+          aria-expanded={open}
+          className={styles.head}
+          onClick={() => setOpen((value) => !value)}
+          type="button"
+        >
+          <span className={styles.glyph}>
+            <IconLayerGroup />
+          </span>
+          <span className={styles.name}>
+            {blocks.length} tool call{blocks.length === 1 ? "" : "s"}
+            {failed ? " · failed" : ""}
+          </span>
+          <span className={styles.summary}>{preview(blocks)}</span>
+          <span className={styles.chevron}>
+            <IconChevronRight />
+          </span>
+        </button>
+
+        {open && (
+          <div className={styles.body}>
+            {blocks.map((block) => (
+              <ToolCard block={block} key={block.id} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 });

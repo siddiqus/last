@@ -161,10 +161,13 @@ function AssistantTurn({ live, turn }: { live: boolean; turn: Turn }) {
   );
 
   const segments = segmentBlocks(turn.blocks, live ? lastIndex : null);
+  // A leading tool card or run carries its own stamp, so skip the turn-level one.
+  const head = segments[0];
+  const stamped = head?.kind === "toolRun" || head?.block.kind === "tool";
 
   return (
     <div className={`${styles.row} ${styles.assistant}`}>
-      <TurnStamp turn={turn} />
+      {!stamped && <TurnStamp turn={turn} />}
 
       <div className={styles.blocks}>
         {segments.map((segment) =>

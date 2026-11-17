@@ -74,6 +74,7 @@ export type Block =
       input: unknown;
       streaming?: boolean;
       subText?: string;
+      timestamp?: string | null;
       result: ToolResult | null;
     }
   | { kind: "image"; mediaType?: string }

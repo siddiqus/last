@@ -178,6 +178,7 @@ export function applyFrame(run: RunState, frame: StreamFrame): void {
           name,
           result: null,
           streaming: true,
+          timestamp: new Date().toISOString(),
         });
         run.toolMap.set(id, position);
         run.indexMap.set(frame.index, position);
@@ -239,6 +240,7 @@ export function applyFrame(run: RunState, frame: StreamFrame): void {
           name: frame.name,
           result: null,
           streaming: false,
+          timestamp: new Date().toISOString(),
         });
         run.toolMap.set(frame.id, next);
         if (isTaskTool(frame.name)) run.taskPos = next;

@@ -401,6 +401,7 @@ export class ThreadBuilder {
     const at = this.run.blocks.length;
     for (const block of blocks) {
       const blockIndex = this.run.blocks.length;
+      if (block.kind === "tool") block.timestamp = timestamp;
       this.run.blocks.push(block);
       if (block.kind === "tool")
         this.tools.set(block.id, { block, blockIndex, turnId: this.run.id });
